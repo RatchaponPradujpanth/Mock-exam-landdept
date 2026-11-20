@@ -65,6 +65,17 @@
   table.data tr.dim td{color:#9aa3b2;text-decoration:line-through}
   table.data tr.add td{background:#fff3cf}
   .res{font-size:13.5px;color:var(--muted);margin-top:6px}
+  .pg{border:2px solid var(--accent);border-radius:10px;padding:14px 16px;margin:16px 0;background:#f5f8fe}
+  .pg h4{margin:0 0 6px;font-size:16px}
+  .pg textarea{width:100%;min-height:110px;font-family:"JetBrains Mono",Menlo,Consolas,monospace;font-size:14px;padding:10px;border:1px solid var(--line);border-radius:8px;resize:vertical;background:var(--code);color:#e5e9f0}
+  .pg .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+  .pg .bar .btn{padding:7px 14px;margin:0}
+  .pg .hint{font-size:13px;color:var(--muted)}
+  .pg-out{margin-top:8px;overflow-x:auto}
+  .pg-msg{font-size:14px;margin:6px 0}
+  .pg-err{color:var(--bad);font-weight:600}
+  .pg-ok{color:var(--ok);font-weight:600}
+  .runbtn{background:var(--ok);color:#fff;border:0;border-radius:6px;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer;margin:2px 0 4px}
   @media print{header{display:none}details{display:block}details>*{display:block}.card{break-inside:avoid}}
 </style>
 </head>
@@ -82,7 +93,7 @@
   </div>
 
   <!-- ข้อ 1 -->
-  <div class="card">
+  <div class="card" id="q1">
     <h2>ตอนที่ 1 · ข้อเขียน</h2>
     <br>
     <h3>ข้อ 1 · SQL <span class="pts">(20 คะแนน)</span></h3>
@@ -119,6 +130,18 @@ land(land_id PK, deed_no, owner_id FK→owner, province, area_wa, price)
       <li>แสดงจำนวนแปลงที่ดินของแต่ละจังหวัด เฉพาะจังหวัดที่มีมากกว่า 1 แปลง</li>
       <li>แสดงชื่อเจ้าของและราคาประเมินรวมของที่ดินทั้งหมดที่แต่ละคนถือ</li>
     </ol>
+    <div class="pg" id="playground">
+      <h4>▶ ลองรัน SQL (ใช้ตาราง owner / land ชุดเดียวกับข้างบน)</h4>
+      <textarea id="sqlIn" spellcheck="false">SELECT * FROM land;</textarea>
+      <div class="bar">
+        <button class="btn" id="runSql">▶ รัน (Ctrl/Cmd + Enter)</button>
+        <button class="btn ghost" id="resetDb">↺ รีเซ็ตข้อมูลกลับเป็นตั้งต้น</button>
+        <button class="btn ghost" id="showTables">ดูตารางตอนนี้</button>
+        <span class="hint" id="dbStatus">กำลังโหลดฐานข้อมูล…</span>
+      </div>
+      <div class="hint">ใช้ SQLite รันในเบราว์เซอร์ · INSERT / UPDATE / DELETE จะเปลี่ยนข้อมูลจริงในหน้านี้ กด "รีเซ็ต" เพื่อกลับเป็นข้อมูลตั้งต้น · ในเฉลยมีปุ่ม ▶ ให้กดรันคำตอบได้</div>
+      <div class="pg-out" id="sqlOut"></div>
+    </div>
     <details>
       <summary>ดูเฉลยข้อ 1</summary>
       <p class="tips" style="margin-top:0">ทุกตารางในเฉลยคิดจาก<b>ตาราง owner / land ชุดเดียวกับในโจทย์</b> (<a href="#sample">↑ กลับไปดูตาราง</a>) · แต่ละข้อคิดจากข้อมูลตั้งต้น ไม่ได้ต่อจากผลของข้ออื่น · คอลัมน์ <b>มาจาก land_id</b> บอกว่าแถวนั้นมาจากแถวไหนในตารางโจทย์</p>
@@ -532,6 +555,93 @@ sBtn.onclick = () => {
     if (left <= 0) { clearInterval(tick); tick = null; tEl.textContent = "หมดเวลา"; sBtn.textContent = "เริ่มใหม่"; left = 90*60; }
   }, 1000);
 };
+</script>
+<script src="vendor/sql-wasm.js"></script>
+<script>
+(function(){
+  const SEED = `
+CREATE TABLE owner(owner_id INTEGER PRIMARY KEY, name TEXT, id_card TEXT, phone TEXT);
+CREATE TABLE land(land_id INTEGER PRIMARY KEY, deed_no TEXT, owner_id INTEGER REFERENCES owner(owner_id), province TEXT, area_wa INTEGER, price INTEGER);
+INSERT INTO owner VALUES
+ (1,'มาลี ศรีสุข','3100000000011','0811111111'),
+ (2,'วิชัย ทองดี','3100000000022','0822222222'),
+ (3,'สุดา แก้วใส','3100000000033','0833333333');
+INSERT INTO land VALUES
+ (1,'12345',1,'ปทุมธานี',800,2500000),
+ (2,'23456',1,'นนทบุรี',350,900000),
+ (3,'34567',2,'ปทุมธานี',1200,3600000),
+ (4,'45678',2,'ปทุมธานี',200,600000),
+ (5,'99999',NULL,'สระบุรี',500,750000);`;
+  let SQL = null, db = null;
+  const $ = id => document.getElementById(id);
+  const out = $("sqlOut"), inp = $("sqlIn"), status = $("dbStatus");
+  const esc = v => String(v).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const fmt = v => v === null ? '<td class="null">NULL</td>'
+    : typeof v === "number" ? `<td class="num">${v.toLocaleString("en-US")}</td>` : `<td>${esc(v)}</td>`;
+  function table(r, title){
+    return (title ? `<div class="res">${title}</div>` : "") +
+      `<table class="data"><tr>${r.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr>` +
+      r.values.map(row=>`<tr>${row.map(fmt).join("")}</tr>`).join("") + `</table>`;
+  }
+  function reset(){ if(db) db.close(); db = new SQL.Database(); db.run("PRAGMA foreign_keys=ON;"); db.exec(SEED); }
+  function currentTables(){
+    let h = '<div class="tables">';
+    for (const t of ["owner","land"]) {
+      const r = db.exec(`SELECT * FROM ${t}`)[0] || {columns:[],values:[]};
+      h += `<div>${table(r, `<b>${t}</b> ตอนนี้ (${r.values.length} แถว)`)}</div>`;
+    }
+    return h + "</div>";
+  }
+  function hintFor(msg){
+    if (/no such column/i.test(msg)) return "ชื่อคอลัมน์ผิด หรือลืมใส่ ' ' ครอบข้อความ";
+    if (/no such table/i.test(msg)) return "ชื่อตารางผิด (มีแค่ owner กับ land)";
+    if (/syntax error/i.test(msg)) return "ไวยากรณ์ผิด ลองเช็คลำดับคำสั่ง / จุลภาค / วงเล็บ";
+    if (/UNIQUE|PRIMARY KEY/i.test(msg)) return "id นี้มีอยู่แล้ว (Primary Key ห้ามซ้ำ) กดรีเซ็ตหรือเปลี่ยน id";
+    if (/FOREIGN KEY/i.test(msg)) return "owner_id นี้ไม่มีในตาราง owner (Foreign Key)";
+    if (/misuse of aggregate|GROUP BY/i.test(msg)) return "ใช้ COUNT/SUM ใน WHERE ไม่ได้ ต้องใช้ HAVING";
+    return "";
+  }
+  function run(sql){
+    if (!db) return;
+    try {
+      const t0 = db.exec("SELECT total_changes()")[0].values[0][0];
+      const res = db.exec(sql);
+      const t1 = db.exec("SELECT total_changes()")[0].values[0][0];
+      let h = "";
+      res.forEach((r,i) => { h += table(r, `ผลลัพธ์${res.length>1?" ชุดที่ "+(i+1):""}: ${r.values.length} แถว`); });
+      const changed = t1 - t0;
+      if (!res.length && changed === 0 && /^\s*select/i.test(sql.replace(/--.*$/mg,"")))
+        h += `<div class="pg-msg">ไม่มีแถวไหนตรงเงื่อนไข (0 แถว)</div>`;
+      if (changed > 0) h += `<div class="pg-msg pg-ok">✓ เปลี่ยนแปลงข้อมูล ${changed} แถว</div>` + currentTables();
+      else if (!res.length && !/^\s*select/i.test(sql.replace(/--.*$/mg,""))) h += `<div class="pg-msg">รันสำเร็จ แต่ไม่มีแถวไหนถูกเปลี่ยน (เช็คเงื่อนไข WHERE)</div>`;
+      out.innerHTML = h;
+    } catch (e) {
+      const hint = hintFor(e.message);
+      out.innerHTML = `<div class="pg-msg pg-err">✗ Error: ${esc(e.message)}</div>` + (hint ? `<div class="pg-msg">💡 ${hint}</div>` : "");
+    }
+  }
+  $("runSql").onclick = () => run(inp.value);
+  inp.addEventListener("keydown", e => { if ((e.ctrlKey||e.metaKey) && e.key === "Enter") { e.preventDefault(); run(inp.value); } });
+  $("resetDb").onclick = () => { if (!SQL) return; reset(); out.innerHTML = '<div class="pg-msg pg-ok">↺ รีเซ็ตแล้ว</div>' + currentTables(); };
+  $("showTables").onclick = () => { if (db) out.innerHTML = currentTables(); };
+
+  // ปุ่ม ▶ บนเฉลย SQL ทุกอัน: รีเซ็ตข้อมูลแล้วรันคำตอบนั้น
+  document.querySelectorAll("#q1 details pre").forEach(pre => {
+    const b = document.createElement("button");
+    b.className = "runbtn"; b.textContent = "▶ รันเฉลยนี้ (บนข้อมูลตั้งต้น)";
+    b.onclick = () => {
+      if (!SQL) return;
+      inp.value = pre.textContent.trim();
+      reset(); run(inp.value);
+      $("playground").scrollIntoView({behavior:"smooth", block:"start"});
+    };
+    pre.after(b);
+  });
+
+  initSqlJs({ locateFile: f => "vendor/" + f }).then(S => {
+    SQL = S; reset(); status.textContent = "พร้อมใช้งาน ✓"; run(inp.value);
+  }).catch(e => { status.textContent = "โหลดไม่สำเร็จ: " + e.message; status.style.color = "var(--bad)"; });
+})();
 </script>
 </body>
 </html>
