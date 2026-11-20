@@ -175,7 +175,7 @@ ORDER BY area_wa DESC;</code></pre>
       <div class="ans"><div class="q">1.3 แก้ไขข้อมูล → UPDATE … SET … WHERE</div>
 <pre><code>UPDATE land SET owner_id = 101
 WHERE deed_no = '12345';</code></pre>
-        <div class="why">ถ้าลืม WHERE = ที่ดิน<b>ทุกแปลง</b>ในระบบจะกลายเป็นของ 101 ทันที</div>
+        <div class="why">ถ้าลืม WHERE = ที่ดิน<b>ทุกแปลง</b>ในระบบจะกลายเป็นของ 101 ทันที · owner 101 ต้อง<b>มีอยู่ในตาราง owner ก่อน</b> (ข้อ 1.1) เพราะ owner_id เป็น Foreign Key ถ้าไม่มีจะ Error</div>
         <div class="res">แถวที่เปลี่ยน = land_id 1 ในตารางโจทย์: owner_id จาก 1 → 101</div>
         <table class="data">
           <tr><th>land_id</th><th>deed_no</th><th>owner_id</th><th>province</th></tr>
@@ -631,7 +631,11 @@ INSERT INTO land VALUES
     b.className = "runbtn"; b.textContent = "▶ รันเฉลยนี้ (บนข้อมูลตั้งต้น)";
     b.onclick = () => {
       if (!SQL) return;
-      inp.value = pre.textContent.trim();
+      let sql = pre.textContent.trim();
+      if (/UPDATE land SET owner_id = 101/.test(sql))
+        sql = "-- เตรียมข้อมูล: owner 101 ต้องมีอยู่ก่อน (จากข้อ 1.1) ไม่งั้นติด Foreign Key\n" +
+              "INSERT INTO owner (owner_id, name, id_card, phone)\nVALUES (101, 'สมชาย ใจดี', '1234567890123', '0812345678');\n\n" + sql;
+      inp.value = sql;
       reset(); run(inp.value);
       $("playground").scrollIntoView({behavior:"smooth", block:"start"});
     };
