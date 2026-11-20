@@ -76,7 +76,13 @@
   .pg-err{color:var(--bad);font-weight:600}
   .pg-ok{color:var(--ok);font-weight:600}
   .runbtn{background:var(--ok);color:#fff;border:0;border-radius:6px;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer;margin:2px 0 4px}
-  @media print{header{display:none}details{display:block}details>*{display:block}.card{break-inside:avoid}}
+  .tabbar{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 0;border-bottom:2px solid var(--line)}
+  .tab{background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;padding:8px 14px;font:inherit;font-size:15px;cursor:pointer;color:var(--muted)}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
+  .algo{padding-left:24px}
+  .algo li{margin:4px 0}
+  .algo ol,.algo ul{margin:2px 0;padding-left:22px}
+  @media print{.tabpanel[hidden]{display:block!important}.tabbar{display:none}header{display:none}details{display:block}details>*{display:block}.card{break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -370,7 +376,7 @@ GROUP BY o.owner_id, o.name;</code></pre>
       <li><b>รายงาน</b> จำนวนคิวของแต่ละประเภทบริการในวันที่ระบุ</li>
     </ol>
     <details>
-      <summary>ดูเฉลยข้อ 3 (Python)</summary>
+      <summary>ดูเฉลยข้อ 3 (3 แบบ: โค้ด / Flowchart / ภาษาไทย)</summary>
       <p><b>คิดก่อนเขียน:</b> โจทย์แบบ "ระบบ 5 process" เกือบทุกข้อคือโครงเดียวกัน = <b>Login → เมนูวนซ้ำ → เพิ่ม / ค้นหา / ยกเลิก / รายงาน</b> จำโครงนี้ไว้แล้วเปลี่ยนแค่ชื่อข้อมูล</p>
       <table>
         <tr><th>ส่วน</th><th>ทำอะไร</th><th>ต้องเช็ค (validation)</th><th>ถ้าเป็น SQL</th></tr>
@@ -381,6 +387,19 @@ GROUP BY o.owner_id, o.name;</code></pre>
         <tr><td><span class="step">5</span>รายงาน</td><td>นับคิวแต่ละบริการในวันนั้น</td><td>นับเฉพาะสถานะ "จอง"</td><td>COUNT + GROUP BY</td></tr>
       </table>
       <p class="why">ข้อมูลแต่ละคิวเก็บเป็น dictionary เช่น <code>{"no": 1, "id_card": "...", "service": "รังวัด", "date": "2026-11-21", "status": "จอง"}</code> แล้วรวมไว้ใน list ชื่อ <code>queues</code> (เหมือนตาราง 1 ตาราง แต่ละ dict = 1 แถว)</p>
+      <div class="tabbar" role="tablist">
+        <button class="tab active" data-tab="code">💻 โค้ด (Python)</button>
+        <button class="tab" data-tab="flow">🔷 Flowchart</button>
+        <button class="tab" data-tab="thai">📝 ภาษาไทย (Algorithm)</button>
+      </div>
+      <div class="tips" style="margin-top:8px"><b>ถ้าโจทย์ให้เลือกวิธีเขียน เลือกอะไรดี</b>
+        <ul>
+          <li><b>ภาษาไทยแบบเป็นขั้นตอน</b> → แนะนำ ถ้ายังไม่คล่องโค้ด เขียนเร็วสุด ไม่มีเรื่อง syntax ผิด แต่ต้องครบ <b>ลำดับ + เงื่อนไข + วนซ้ำ + validation</b> เหมือนโค้ด ไม่ใช่เขียนบรรยายลอยๆ</li>
+          <li><b>โค้ด</b> → คะแนนเต็มได้ง่ายสุดถ้าเขียนถูก แต่ถ้า syntax ผิดเยอะหรือค้างกลางทาง เสียทั้งข้อ</li>
+          <li><b>Flowchart</b> → ใช้เวลาวาดนานสุดสำหรับระบบ 5 ส่วน · ถ้าจำเป็นต้องวาด ให้วาด<b>โปรแกรมหลัก 1 รูป</b> ใช้สัญลักษณ์ Predefined Process (สี่เหลี่ยมมีขีดข้าง) แทนแต่ละส่วน แล้ววาดละเอียดแค่ส่วนที่ซับซ้อนสุด (จองคิว)</li>
+        </ul>
+      </div>
+      <div class="tabpanel" data-panel="code">
 <pre><code>users = {"admin": "1234"}
 SERVICES = ["จดทะเบียนสิทธิ", "รังวัด", "ขอคัดสำเนา"]
 queues = []      # แต่ละคิว = {no, id_card, service, date, status}
@@ -475,6 +494,62 @@ main()</code></pre>
           <li>ใช้เปลี่ยน status เป็น "ยกเลิก" แทนการลบทิ้ง (soft delete) แล้วเขียนอธิบายว่าเพื่อเก็บประวัติไว้ตรวจสอบ จะได้คะแนนเพิ่ม</li>
           <li>ถ้ามีเวลา เขียนเพิ่มว่าถ้าใช้ฐานข้อมูลจริง ส่วนจองคิวจะเป็น <code>INSERT</code> และส่วนยกเลิกจะเป็น <code>UPDATE queue SET status='ยกเลิก' WHERE no=?</code></li>
         </ul>
+      </div>
+      </div>
+      <div class="tabpanel" data-panel="flow" hidden>
+        <p><b>รูปที่ 1 · โปรแกรมหลัก</b> (Login → เมนูวนซ้ำ → แยกไปแต่ละส่วน)</p>
+        <div class="legend">
+          <span><i class="sw" style="background:#efe6fb;box-shadow:inset 4px 0 0 -2px #1d2330,inset -4px 0 0 -2px #1d2330"></i>สี่เหลี่ยมมีขีดข้าง = Predefined Process (เรียกโปรแกรมย่อย มีรายละเอียดแยกอีกรูป)</span>
+        </div>
+        <svg class="fc" viewBox="0 0 700 1075" role="img" aria-label="Flowchart โปรแกรมหลัก"><path class="line" d="M300,64 V90" marker-end="url(#ar)"/><path class="line" d="M300,136 V160" marker-end="url(#ar)"/><path class="line" d="M300,206 V224" marker-end="url(#ar)"/><path class="line" d="M400,270 H430" marker-end="url(#ar)"/><path class="line" d="M520,293 V324" marker-end="url(#ar)"/><path class="line" d="M610,370 H650 V183 H414" marker-end="url(#ar)"/><path class="line" d="M520,416 V440" marker-end="url(#ar)"/><path class="line" d="M520,486 V510" marker-end="url(#ar)"/><path class="line" d="M300,316 V590" marker-end="url(#ar)"/><path class="line" d="M300,636 V660" marker-end="url(#ar)"/><path class="line" d="M300,706 V724" marker-end="url(#ar)"/><path class="line" d="M390,770 H460" marker-end="url(#ar)"/><path class="line" d="M300,816 V834" marker-end="url(#ar)"/><path class="line" d="M300,926 V940 H90 V960"/><path class="line" d="M90,940 V960" marker-end="url(#ar)"/><path class="line" d="M210,940 V960" marker-end="url(#ar)"/><path class="line" d="M330,940 V960" marker-end="url(#ar)"/><path class="line" d="M450,940 V960" marker-end="url(#ar)"/><path class="line" d="M300,940 H590 V960" marker-end="url(#ar)"/><path class="line" d="M90,1010 V1040 H590 V1006"/><path class="line" d="M210,1010 V1040"/><path class="line" d="M330,1010 V1040"/><path class="line" d="M450,1010 V1040"/><path class="line" d="M90,1040 V1060 H20 V613 H200" marker-end="url(#ar)"/><rect class="shape" x="230.0" y="20" width="140" height="44" rx="22.0" fill="#eceff3"/><text x="300" y="47" text-anchor="middle" class="">เริ่มต้น</text><rect class="shape" x="210.0" y="90" width="180" height="46" fill="#e3edfb"/><text x="300" y="118" text-anchor="middle" class="">count = 0</text><polygon class="shape" points="193.0,160 425.0,160 407.0,206 175.0,206" fill="#e3f5ea"/><text x="300" y="188" text-anchor="middle" class="">รับ username, password</text><polygon class="shape" points="300,224 400,270 300,316 200,270" fill="#fff3cf"/><text x="300" y="275" text-anchor="middle" class="">ถูกต้อง?</text><text x="410" y="260" text-anchor="start" class="lbl no">ไม่</text><text x="310" y="335" text-anchor="start" class="lbl yes">ใช่</text><rect class="shape" x="430.0" y="247" width="180" height="46" fill="#e3edfb"/><text x="520" y="275" text-anchor="middle" class="">count = count + 1</text><polygon class="shape" points="520,324 610,370 520,416 430,370" fill="#fff3cf"/><text x="520" y="375" text-anchor="middle" class="">count = 3 ?</text><text x="620" y="360" text-anchor="start" class="lbl no">ไม่</text><text x="530" y="432" text-anchor="start" class="lbl yes">ใช่</text><text x="668" y="276" text-anchor="middle" class="lbl" style="fill:#6b7486" transform="rotate(90 668 276)">ลองใหม่</text><polygon class="shape" points="443.0,440 615.0,440 597.0,486 425.0,486" fill="#e3f5ea"/><text x="520" y="468" text-anchor="middle" class="">แสดง 'ล็อกบัญชี'</text><rect class="shape" x="465.0" y="510" width="110" height="44" rx="22.0" fill="#eceff3"/><text x="520" y="537" text-anchor="middle" class="">จบ</text><polygon class="shape" points="193.0,590 425.0,590 407.0,636 175.0,636" fill="#e3f5ea"/><text x="300" y="618" text-anchor="middle" class="">แสดงเมนู 1–4, 0 = ออก</text><polygon class="shape" points="218.0,660 400.0,660 382.0,706 200.0,706" fill="#e3f5ea"/><text x="300" y="688" text-anchor="middle" class="">รับ choice</text><polygon class="shape" points="300,724 390,770 300,816 210,770" fill="#fff3cf"/><text x="300" y="775" text-anchor="middle" class="">choice = 0 ?</text><text x="398" y="760" text-anchor="start" class="lbl yes">ใช่</text><text x="310" y="830" text-anchor="start" class="lbl no">ไม่</text><rect class="shape" x="460.0" y="748" width="110" height="44" rx="22.0" fill="#eceff3"/><text x="515" y="775" text-anchor="middle" class="">จบ</text><polygon class="shape" points="300,834 390,880 300,926 210,880" fill="#fff3cf"/><text x="300" y="885" text-anchor="middle" class="">choice ?</text><rect class="shape" x="37.5" y="960" width="105" height="50" fill="#efe6fb"/><line class="shape" x1="47.5" y1="960" x2="47.5" y2="1010"/><line class="shape" x1="132.5" y1="960" x2="132.5" y2="1010"/><text x="90" y="990" text-anchor="middle" class="" style="font-size:14px">จองคิว</text><rect class="shape" x="157.5" y="960" width="105" height="50" fill="#efe6fb"/><line class="shape" x1="167.5" y1="960" x2="167.5" y2="1010"/><line class="shape" x1="252.5" y1="960" x2="252.5" y2="1010"/><text x="210" y="990" text-anchor="middle" class="" style="font-size:14px">ค้นหาคิว</text><rect class="shape" x="277.5" y="960" width="105" height="50" fill="#efe6fb"/><line class="shape" x1="287.5" y1="960" x2="287.5" y2="1010"/><line class="shape" x1="372.5" y1="960" x2="372.5" y2="1010"/><text x="330" y="990" text-anchor="middle" class="" style="font-size:14px">ยกเลิกคิว</text><rect class="shape" x="397.5" y="960" width="105" height="50" fill="#efe6fb"/><line class="shape" x1="407.5" y1="960" x2="407.5" y2="1010"/><line class="shape" x1="492.5" y1="960" x2="492.5" y2="1010"/><text x="450" y="990" text-anchor="middle" class="" style="font-size:14px">รายงาน</text><polygon class="shape" points="548.0,960 650.0,960 632.0,1006 530.0,1006" fill="#e3f5ea"/><text x="590" y="988" text-anchor="middle" class="" style="font-size:14px">เลือกผิด</text><text x="97" y="954" text-anchor="start" class="lbl">1</text><text x="217" y="954" text-anchor="start" class="lbl">2</text><text x="337" y="954" text-anchor="start" class="lbl">3</text><text x="457" y="954" text-anchor="start" class="lbl">4</text><text x="597" y="954" text-anchor="start" class="lbl">อื่นๆ</text><text x="12" y="880" class="lbl" style="fill:#6b7486" transform="rotate(-90 12 880)">วนกลับไปแสดงเมนู</text></svg>
+        <p><b>รูปที่ 2 · โปรแกรมย่อย "จองคิว"</b> (ส่วนที่มี validation เยอะที่สุด)</p>
+        <svg class="fc" viewBox="0 0 660 740" role="img" aria-label="Flowchart จองคิว"><path class="line" d="M300,64 V90" marker-end="url(#ar)"/><path class="line" d="M300,136 V154" marker-end="url(#ar)"/><path class="line" d="M430,200 H462" marker-end="url(#ar)"/><path class="line" d="M620,200 H645 V702 H372" marker-end="url(#ar)"/><path class="line" d="M300,246 V280" marker-end="url(#ar)"/><path class="line" d="M300,326 V344" marker-end="url(#ar)"/><path class="line" d="M430,390 H462" marker-end="url(#ar)"/><path class="line" d="M620,390 H645"/><path class="line" d="M300,436 V466" marker-end="url(#ar)"/><path class="line" d="M300,516 V546" marker-end="url(#ar)"/><path class="line" d="M300,592 V616" marker-end="url(#ar)"/><path class="line" d="M300,662 V680" marker-end="url(#ar)"/><rect class="shape" x="220.0" y="20" width="160" height="44" rx="22.0" fill="#eceff3"/><text x="300" y="47" text-anchor="middle" class="">เริ่ม: จองคิว</text><polygon class="shape" points="208.0,90 410.0,90 392.0,136 190.0,136" fill="#e3f5ea"/><text x="300" y="118" text-anchor="middle" class="">รับ id_card</text><polygon class="shape" points="300,154 430,200 300,246 170,200" fill="#fff3cf"/><text x="300" y="191.5" text-anchor="middle" class="" style="font-size:14px"><tspan x="300" dy="0">13 หลัก และ</tspan><tspan x="300" dy="17">เป็นตัวเลข ?</tspan></text><text x="440" y="190" text-anchor="start" class="lbl no">ไม่</text><text x="310" y="266" text-anchor="start" class="lbl yes">ใช่</text><polygon class="shape" points="480.5,177 627.5,177 609.5,223 462.5,223" fill="#e3f5ea"/><text x="545" y="205" text-anchor="middle" class="" style="font-size:14px">แจ้ง 'เลขบัตรผิด'</text><polygon class="shape" points="198.0,280 420.0,280 402.0,326 180.0,326" fill="#e3f5ea"/><text x="300" y="308" text-anchor="middle" class="">รับ service, date</text><polygon class="shape" points="300,344 430,390 300,436 170,390" fill="#fff3cf"/><text x="300" y="381.5" text-anchor="middle" class="" style="font-size:14px"><tspan x="300" dy="0">วันนี้จอง</tspan><tspan x="300" dy="17">ไปแล้ว ?</tspan></text><text x="440" y="380" text-anchor="start" class="lbl yes">ใช่</text><text x="310" y="456" text-anchor="start" class="lbl no">ไม่</text><polygon class="shape" points="480.5,367 627.5,367 609.5,413 462.5,413" fill="#e3f5ea"/><text x="545" y="395" text-anchor="middle" class="" style="font-size:14px">แจ้ง 'จองซ้ำ'</text><rect class="shape" x="170.0" y="466" width="260" height="50" fill="#e3edfb"/><text x="300" y="482.5" text-anchor="middle" class="" style="font-size:14px"><tspan x="300" dy="0">เพิ่มคิวลง queues</tspan><tspan x="300" dy="17">status = 'จอง'</tspan></text><polygon class="shape" points="203.0,546 415.0,546 397.0,592 185.0,592" fill="#e3f5ea"/><text x="300" y="574" text-anchor="middle" class="">แสดงหมายเลขคิว</text><rect class="shape" x="200.0" y="616" width="200" height="46" fill="#e3edfb"/><text x="300" y="644" text-anchor="middle" class="">next_no = next_no + 1</text><rect class="shape" x="230.0" y="680" width="140" height="44" rx="22.0" fill="#eceff3"/><text x="300" y="707" text-anchor="middle" class="">กลับเมนู</text></svg>
+        <div class="tips"><b>เทคนิคในห้องสอบ</b>
+          <ul>
+            <li>ส่วนที่เหลือ (ค้นหา / ยกเลิก / รายงาน) ถ้าเวลาไม่พอ วาดแค่รูปที่ 1 + รูปจองคิว แล้วเขียนอธิบายส่วนที่เหลือเป็นข้อความสั้นๆ</li>
+            <li>ทุกทางแยก (ข้าวหลามตัด) ต้องเขียน <b>ใช่ / ไม่ใช่</b> กำกับทั้งสองทาง</li>
+            <li>ทุก loop ต้องมีลูกศรวนกลับ และต้องมีทางออก (count = 3, choice = 0)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tabpanel" data-panel="thai" hidden>
+        <p>เขียนเป็นขั้นตอนมีเลขกำกับ บอกให้ชัดว่า <b>รับอะไร → ตรวจอะไร → ถ้าผิดทำอะไร → ถ้าถูกทำอะไร → ไปข้อไหนต่อ</b></p>
+        <ol class="algo">
+<li><b>เริ่มต้น</b> สร้างรายการคิวว่าง (queues) และให้หมายเลขคิวถัดไป = 1</li>
+<li><b>Login</b>
+  <ol type="a">
+  <li>ให้ count = 0</li>
+  <li>รับ username และ password</li>
+  <li>ถ้าถูกต้อง → แสดง "เข้าสู่ระบบสำเร็จ" ไปข้อ 3</li>
+  <li>ถ้าไม่ถูกต้อง → count = count + 1 · ถ้า count = 3 แสดง "ล็อกบัญชี" แล้ว<b>จบโปรแกรม</b> · ถ้ายังไม่ครบ กลับไปข้อ 2b</li>
+  </ol></li>
+<li><b>เมนูหลัก</b> แสดงเมนู 1 จองคิว · 2 ค้นหา · 3 ยกเลิก · 4 รายงาน · 0 ออก แล้วรับ choice
+  <ul><li>0 → จบโปรแกรม · 1–4 → ไปข้อ 4–7 · อื่นๆ → แสดง "เลือกผิด" · ทำเสร็จทุกข้อ<b>กลับมาข้อ 3</b></li></ul></li>
+<li><b>จองคิว</b>
+  <ol type="a">
+  <li>รับเลขบัตรประชาชน · ถ้าไม่ใช่ตัวเลข 13 หลัก → แจ้ง "เลขบัตรไม่ถูกต้อง" กลับเมนู</li>
+  <li>แสดงบริการ 1 จดทะเบียนสิทธิ 2 รังวัด 3 ขอคัดสำเนา แล้วรับตัวเลือก · ถ้าไม่ใช่ 1–3 → แจ้ง "ไม่มีบริการนี้" กลับเมนู</li>
+  <li>รับวันที่</li>
+  <li>ตรวจทุกคิวในรายการ ถ้ามีคิวที่เลขบัตรและวันที่ตรงกัน และสถานะเป็น "จอง" → แจ้ง "จองซ้ำ" กลับเมนู</li>
+  <li>บันทึกคิวใหม่ (หมายเลขคิว, เลขบัตร, บริการ, วันที่, สถานะ = "จอง")</li>
+  <li>แสดงหมายเลขคิว แล้วเพิ่มหมายเลขคิวถัดไปขึ้น 1</li>
+  </ol></li>
+<li><b>ค้นหาคิว</b> รับเลขบัตร → วนดูทุกคิว แสดงคิวที่เลขบัตรตรงกัน (หมายเลข, บริการ, วันที่, สถานะ) · ถ้าไม่พบเลยแจ้ง "ไม่พบข้อมูล"</li>
+<li><b>ยกเลิกคิว</b>
+  <ol type="a">
+  <li>รับหมายเลขคิว · ถ้าไม่ใช่ตัวเลข → แจ้งเตือน กลับเมนู</li>
+  <li>ค้นหาคิวที่หมายเลขตรงและสถานะ "จอง" · ถ้าไม่พบ → แจ้ง "ไม่พบคิวนี้"</li>
+  <li>ถามยืนยัน (y/n) · ถ้า y เปลี่ยนสถานะเป็น "ยกเลิก" (ไม่ลบทิ้ง เพื่อเก็บประวัติ) แล้วแจ้ง "ยกเลิกแล้ว"</li>
+  </ol></li>
+<li><b>รายงาน</b> รับวันที่ → สำหรับแต่ละบริการ นับคิวที่วันที่ตรงและสถานะ "จอง" → แสดง "ชื่อบริการ : จำนวน คิว"</li>
+</ol>
+        <div class="tips"><b>จุดที่ทำให้ได้คะแนน</b>
+          <ul>
+            <li>มีเลขข้อ และบอกว่า "กลับไปข้อ…" ตรงที่วนซ้ำ (แทนลูกศรวนใน flowchart)</li>
+            <li>ทุกจุดที่รับค่ามี "ถ้า… ให้…" (validation) ครบเหมือนในโค้ด</li>
+            <li>ใช้คำว่า <b>รับ / แสดง / ถ้า / มิฉะนั้น / วนซ้ำ / จบ</b> ให้คงที่ คนตรวจอ่านง่าย</li>
+          </ul>
+        </div>
       </div>
     </details>
   </div>
@@ -646,6 +721,15 @@ INSERT INTO land VALUES
     SQL = S; reset(); status.textContent = "พร้อมใช้งาน ✓"; run(inp.value);
   }).catch(e => { status.textContent = "โหลดไม่สำเร็จ: " + e.message; status.style.color = "var(--bad)"; });
 })();
+</script>
+<script>
+document.querySelectorAll(".tabbar").forEach(bar => {
+  const root = bar.parentElement;
+  bar.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+    bar.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === b));
+    root.querySelectorAll(".tabpanel").forEach(p => p.hidden = p.dataset.panel !== b.dataset.tab);
+  });
+});
 </script>
 </body>
 </html>
