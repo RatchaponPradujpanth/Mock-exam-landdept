@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ข้อสอบจำลอง นักวิชาการคอมพิวเตอร์ กรมที่ดิน</title>
+<style>
+  :root{--bg:#f6f7f9;--card:#fff;--ink:#1d2330;--muted:#5b6475;--line:#e3e6eb;--accent:#1f5fbf;--ok:#1a7f45;--bad:#c0392b;--code:#0f172a}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Sarabun","Noto Sans Thai",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;font-size:16px}
+  header{position:sticky;top:0;z-index:5;background:var(--ink);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  header h1{font-size:17px;margin:0;flex:1}
+  .timer{font-variant-numeric:tabular-nums;font-size:18px;font-weight:700}
+  header button{background:#fff;color:var(--ink);border:0;border-radius:6px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+  main{max-width:860px;margin:0 auto;padding:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 24px;margin-bottom:18px}
+  h2{font-size:20px;margin:0 0 4px}
+  h3{font-size:17px;margin:0 0 8px}
+  .pts{color:var(--muted);font-weight:400;font-size:14px}
+  ol.sub{padding-left:22px;margin:8px 0}
+  pre{background:var(--code);color:#e5e9f0;padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:13.5px;line-height:1.55;margin:10px 0}
+  code{font-family:"JetBrains Mono",Menlo,Consolas,monospace}
+  p code,li code{background:#eef1f5;padding:1px 5px;border-radius:4px;font-size:14px}
+  details{margin-top:14px;border-top:1px dashed var(--line);padding-top:10px}
+  summary{cursor:pointer;color:var(--accent);font-weight:600;user-select:none}
+  .tips{background:#fff8e6;border-left:4px solid #e0a800;padding:10px 14px;border-radius:6px;margin-top:10px}
+  .tips ul{margin:4px 0;padding-left:20px}
+  .mcq{margin:14px 0;padding-bottom:12px;border-bottom:1px solid var(--line)}
+  .mcq:last-of-type{border-bottom:0}
+  .mcq label{display:block;padding:4px 8px;border-radius:6px;cursor:pointer}
+  .mcq label:hover{background:#f0f3f8}
+  .mcq label.correct{background:#e3f5ea;color:var(--ok);font-weight:600}
+  .mcq label.wrong{background:#fbe6e3;color:var(--bad);text-decoration:line-through}
+  .explain{display:none;color:var(--muted);font-size:14px;margin:4px 8px 0}
+  .checked .explain{display:block}
+  .btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:10px 18px;font:inherit;cursor:pointer;margin-right:8px}
+  .btn.ghost{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+  #score{font-weight:700;font-size:18px;margin-left:6px}
+  .intro{color:var(--muted)}
+  .ans{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:10px 0;background:#fbfcfd}
+  .ans .q{font-weight:600}
+  .ans pre{margin:6px 0}
+  .why{color:var(--muted);font-size:14.5px}
+  .why b{color:var(--ink)}
+  .fc{width:100%;max-width:640px;display:block;margin:10px auto}
+  .fc text{font-family:"Sarabun","Noto Sans Thai",system-ui,sans-serif;font-size:15px;fill:var(--ink)}
+  .fc .lbl{font-size:14px;font-weight:700}
+  .fc .yes{fill:var(--ok)} .fc .no{fill:var(--bad)}
+  .fc .shape{stroke:var(--ink);stroke-width:2}
+  .fc .line{stroke:#6b7486;stroke-width:2;fill:none}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:14px;margin:8px 0}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:22px;height:14px;border:2px solid var(--ink);display:inline-block}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;margin:8px 0}
+  th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+  th{background:#eef1f5}
+  .step{display:inline-block;background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px;font-size:13px;margin-right:6px}
+  @media print{header{display:none}details{display:block}details>*{display:block}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header>
+  <h1>ข้อสอบจำลอง · นักวิชาการคอมพิวเตอร์ กรมที่ดิน</h1>
+  <span class="timer" id="timer">90:00</span>
+  <button id="startBtn">เริ่มจับเวลา</button>
+  <button id="toggleAll">เปิดเฉลยทั้งหมด</button>
+</header>
+
+<main>
+  <div class="card intro">
+    สัดส่วนตามที่มีคนเล่ามา: ข้อเขียน 70% / ปรนัย 30% · ลองเขียนบนกระดาษจริงก่อนประมาณ 90 นาที แล้วค่อยกดดูเฉลยทีละข้อ
+  </div>
+
+  <!-- ข้อ 1 -->
+  <div class="card">
+    <h2>ตอนที่ 1 · ข้อเขียน</h2>
+    <br>
+    <h3>ข้อ 1 · SQL <span class="pts">(20 คะแนน)</span></h3>
+    กำหนดให้มี 2 ตาราง:
+<pre><code>owner(owner_id PK, name, id_card, phone)
+land(land_id PK, deed_no, owner_id FK→owner, province, area_wa, price)
+-- area_wa = เนื้อที่ (ตารางวา), price = ราคาประเมิน</code></pre>
+    <ol class="sub">
+      <li>เพิ่มเจ้าของชื่อ "สมชาย ใจดี" owner_id = 101 เลขบัตร 1234567890123 เบอร์ 0812345678</li>
+      <li>แสดงที่ดินในจังหวัดปทุมธานีที่มีเนื้อที่มากกว่า 400 ตร.วา เรียงจากเนื้อที่มากไปน้อย</li>
+      <li>โฉนดเลขที่ 12345 ถูกโอนให้ owner_id = 101 ให้แก้ไขข้อมูล</li>
+      <li>ลบที่ดินโฉนดเลขที่ 99999</li>
+      <li>แสดงเลขโฉนด ชื่อเจ้าของ และจังหวัด ของที่ดินทุกแปลง</li>
+      <li>แสดงจำนวนแปลงที่ดินของแต่ละจังหวัด เฉพาะจังหวัดที่มีมากกว่า 10 แปลง</li>
+      <li>แสดงชื่อเจ้าของและราคาประเมินรวมของที่ดินทั้งหมดที่แต่ละคนถือ</li>
+    </ol>
+    <details>
+      <summary>ดูเฉลยข้อ 1</summary>
+      <p class="why">วิธีคิดทุกข้อ: <b>อยากได้อะไร</b> (SELECT) → <b>จากตารางไหน</b> (FROM / JOIN) → <b>เงื่อนไขอะไร</b> (WHERE) → <b>จัดกลุ่ม/เรียงไหม</b> (GROUP BY / HAVING / ORDER BY)</p>
+
+      <div class="ans"><div class="q">1.1 เพิ่มข้อมูล → INSERT</div>
+<pre><code>INSERT INTO owner (owner_id, name, id_card, phone)
+VALUES (101, 'สมชาย ใจดี', '1234567890123', '0812345678');</code></pre>
+        <div class="why">ใส่ชื่อคอลัมน์ในวงเล็บแรก แล้วใส่ค่าใน VALUES <b>ตามลำดับเดียวกัน</b> · เลขบัตรใส่ <code>'...'</code> เพราะเป็นข้อความ</div></div>
+
+      <div class="ans"><div class="q">1.2 ค้นหา + เงื่อนไข 2 อย่าง + เรียง → SELECT … WHERE … AND … ORDER BY</div>
+<pre><code>SELECT * FROM land
+WHERE province = 'ปทุมธานี' AND area_wa &gt; 400
+ORDER BY area_wa DESC;</code></pre>
+        <div class="why">เงื่อนไขต้องจริง <b>ทั้งคู่</b> จึงใช้ AND · มากไปน้อย = <b>DESC</b> (น้อยไปมาก = ASC)</div></div>
+
+      <div class="ans"><div class="q">1.3 แก้ไขข้อมูล → UPDATE … SET … WHERE</div>
+<pre><code>UPDATE land SET owner_id = 101
+WHERE deed_no = '12345';</code></pre>
+        <div class="why">ถ้าลืม WHERE = ที่ดิน<b>ทุกแปลง</b>ในระบบจะกลายเป็นของ 101 ทันที</div></div>
+
+      <div class="ans"><div class="q">1.4 ลบข้อมูล → DELETE FROM … WHERE</div>
+<pre><code>DELETE FROM land WHERE deed_no = '99999';</code></pre>
+        <div class="why">ไม่ต้องใส่ * (ไม่ใช่ <code>DELETE * FROM</code>) · ลืม WHERE = ลบทั้งตาราง</div></div>
+
+      <div class="ans"><div class="q">1.5 ข้อมูลอยู่คนละตาราง → JOIN</div>
+<pre><code>SELECT l.deed_no, o.name, l.province
+FROM land l
+JOIN owner o ON l.owner_id = o.owner_id;</code></pre>
+        <div class="why">ชื่อเจ้าของอยู่ตาราง owner แต่เลขโฉนดอยู่ตาราง land → เชื่อมด้วย<b>คอลัมน์ที่เหมือนกัน</b> (owner_id) · <code>l</code>, <code>o</code> คือชื่อย่อตาราง จะได้เขียนสั้นลง</div></div>
+
+      <div class="ans"><div class="q">1.6 นับแยกกลุ่ม + กรองหลังนับ → GROUP BY + HAVING</div>
+<pre><code>SELECT province, COUNT(*) AS total
+FROM land
+GROUP BY province
+HAVING COUNT(*) &gt; 10;</code></pre>
+        <div class="why">คำว่า "<b>แต่ละ</b>จังหวัด" = GROUP BY province · เงื่อนไขที่ใช้ผลนับ (COUNT) ต้องใช้ <b>HAVING</b> เพราะ WHERE ทำงานก่อนการนับ</div></div>
+
+      <div class="ans"><div class="q">1.7 รวมยอดของแต่ละคน → JOIN + SUM + GROUP BY</div>
+<pre><code>SELECT o.name, SUM(l.price) AS total_price
+FROM owner o
+JOIN land l ON o.owner_id = l.owner_id
+GROUP BY o.owner_id, o.name;</code></pre>
+        <div class="why">"<b>แต่ละ</b>คน" = GROUP BY · group ด้วย owner_id ด้วยกันกรณีชื่อซ้ำ · คอลัมน์ที่อยู่ใน SELECT แต่ไม่ได้อยู่ในฟังก์ชัน (name) ต้องอยู่ใน GROUP BY</div></div>
+      <div class="tips"><b>จุดที่มักโดนหักคะแนน</b>
+        <ul>
+          <li>id_card และ deed_no ต้องอยู่ใน <code>'...'</code> เพราะเป็นข้อความ ถ้าเก็บเป็นตัวเลข เลข 0 ข้างหน้าจะหาย</li>
+          <li>กรองหลังจัดกลุ่มต้องใช้ <b>HAVING</b> ไม่ใช่ WHERE</li>
+          <li>UPDATE / DELETE ต้องมี WHERE เสมอ</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <!-- ข้อ 2 -->
+  <div class="card">
+    <h3>ข้อ 2 · Flowchart <span class="pts">(15 คะแนน)</span></h3>
+    เขียน flowchart ของโปรแกรมคิดค่าธรรมเนียมโอนที่ดิน:
+    <ul>
+      <li>รับราคาประเมินทีละแปลง ถ้าป้อน 0 ให้หยุด</li>
+      <li>ถ้าราคาประเมินเกิน 1,000,000 บาท คิดค่าธรรมเนียม 2% ถ้าไม่เกินคิด 1%</li>
+      <li>แสดงค่าธรรมเนียมของแต่ละแปลง และแสดงยอดรวมทั้งหมดตอนจบ</li>
+    </ul>
+    <details>
+      <summary>ดูเฉลยข้อ 2</summary>
+      <div class="legend">
+        <span><i class="sw" style="border-radius:10px;background:#eceff3"></i>วงรี = เริ่ม / จบ</span>
+        <span><i class="sw" style="background:#e3edfb"></i>สี่เหลี่ยม = คำนวณ (process)</span>
+        <span><i class="sw" style="background:#e3f5ea;transform:skewX(-20deg)"></i>ด้านขนาน = รับค่า / แสดงผล</span>
+        <span><i class="sw" style="background:#fff3cf;transform:rotate(45deg) scale(.75)"></i>ข้าวหลามตัด = ตัดสินใจ</span>
+      </div>
+
+      <svg class="fc" viewBox="0 0 640 800" role="img" aria-label="Flowchart คิดค่าธรรมเนียมโอนที่ดิน">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7486"/></marker></defs>
+
+        <!-- เส้นเชื่อม -->
+        <path class="line" d="M300,70 V100" marker-end="url(#ar)"/>
+        <path class="line" d="M300,150 V180" marker-end="url(#ar)"/>
+        <path class="line" d="M300,230 V250" marker-end="url(#ar)"/>
+        <path class="line" d="M410,300 H466" marker-end="url(#ar)"/>
+        <path class="line" d="M540,325 V360" marker-end="url(#ar)"/>
+        <path class="line" d="M300,350 V380" marker-end="url(#ar)"/>
+        <path class="line" d="M170,430 H130 V510" marker-end="url(#ar)"/>
+        <path class="line" d="M430,430 H470 V510" marker-end="url(#ar)"/>
+        <path class="line" d="M130,560 V595 H470 V560"/>
+        <path class="line" d="M300,595 V620" marker-end="url(#ar)"/>
+        <path class="line" d="M300,670 V700" marker-end="url(#ar)"/>
+        <path class="line" d="M300,750 V780 H20 V205 H206" marker-end="url(#ar)"/>
+        <text x="12" y="560" class="lbl" style="fill:#6b7486" transform="rotate(-90 12 560)">วนกลับไปรับแปลงถัดไป</text>
+
+        <!-- รูปทรง -->
+        <rect class="shape" x="225" y="20" width="150" height="50" rx="25" fill="#eceff3"/>
+        <text x="300" y="50" text-anchor="middle">เริ่มต้น</text>
+
+        <rect class="shape" x="210" y="100" width="180" height="50" fill="#e3edfb"/>
+        <text x="300" y="130" text-anchor="middle">total = 0</text>
+
+        <polygon class="shape" points="220,180 400,180 380,230 200,230" fill="#e3f5ea"/>
+        <text x="300" y="210" text-anchor="middle">รับ price</text>
+
+        <polygon class="shape" points="300,250 410,300 300,350 190,300" fill="#fff3cf"/>
+        <text x="300" y="305" text-anchor="middle">price = 0 ?</text>
+        <text x="420" y="290" class="lbl yes">ใช่</text>
+        <text x="310" y="372" class="lbl no">ไม่ใช่</text>
+
+        <polygon class="shape" points="480,275 620,275 600,325 460,325" fill="#e3f5ea"/>
+        <text x="540" y="305" text-anchor="middle">แสดง total</text>
+
+        <rect class="shape" x="475" y="360" width="130" height="46" rx="23" fill="#eceff3"/>
+        <text x="540" y="388" text-anchor="middle">จบ</text>
+
+        <polygon class="shape" points="300,380 430,430 300,480 170,430" fill="#fff3cf"/>
+        <text x="300" y="435" text-anchor="middle">price &gt; 1,000,000 ?</text>
+        <text x="138" y="420" class="lbl yes">ใช่</text>
+        <text x="440" y="420" class="lbl no">ไม่ใช่</text>
+
+        <rect class="shape" x="40" y="510" width="180" height="50" fill="#e3edfb"/>
+        <text x="130" y="540" text-anchor="middle">fee = price × 0.02</text>
+
+        <rect class="shape" x="380" y="510" width="180" height="50" fill="#e3edfb"/>
+        <text x="470" y="540" text-anchor="middle">fee = price × 0.01</text>
+
+        <rect class="shape" x="190" y="620" width="220" height="50" fill="#e3edfb"/>
+        <text x="300" y="650" text-anchor="middle">total = total + fee</text>
+
+        <polygon class="shape" points="220,700 400,700 380,750 200,750" fill="#e3f5ea"/>
+        <text x="300" y="730" text-anchor="middle">แสดง fee</text>
+      </svg>
+
+      <p><b>ลองเดินตาม flowchart ด้วยตัวเลขจริง</b> (ทำแบบนี้ในห้องสอบเพื่อเช็คว่าถูก)</p>
+      <table>
+        <tr><th>รอบ</th><th>รับ price</th><th>= 0 ?</th><th>&gt; 1 ล้าน ?</th><th>fee</th><th>total</th></tr>
+        <tr><td>เริ่ม</td><td>–</td><td>–</td><td>–</td><td>–</td><td>0</td></tr>
+        <tr><td>1</td><td>500,000</td><td>ไม่</td><td>ไม่ → 1%</td><td>5,000</td><td>5,000</td></tr>
+        <tr><td>2</td><td>2,000,000</td><td>ไม่</td><td>ใช่ → 2%</td><td>40,000</td><td>45,000</td></tr>
+        <tr><td>3</td><td>0</td><td>ใช่ → แสดง total แล้วจบ</td><td>–</td><td>–</td><td><b>45,000</b></td></tr>
+      </table>
+      <div class="tips"><b>คะแนนอยู่ที่</b>
+        <ul>
+          <li>ใช้สัญลักษณ์ถูก: วงรี = เริ่ม/จบ, สี่เหลี่ยม = process, ข้าวหลามตัด = decision, ด้านขนาน = input/output</li>
+          <li>ให้ค่าเริ่มต้น total = 0 ก่อนเข้า loop</li>
+          <li>เช็คเงื่อนไขหยุด (0) <b>ก่อน</b>คำนวณ</li>
+          <li>ลูกศรวนกลับไปที่จุดรับค่า</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <!-- ข้อ 3 -->
+  <div class="card">
+    <h3>ข้อ 3 · เขียนโปรแกรม <span class="pts">(35 คะแนน)</span></h3>
+    เขียนโปรแกรม <b>ระบบจองคิวรับบริการสำนักงานที่ดิน</b> ด้วยภาษาใดก็ได้ ให้มี 5 ส่วน:
+    <ol class="sub">
+      <li><b>Login</b> ของเจ้าหน้าที่ ถ้าใส่ผิด 3 ครั้งให้ล็อก</li>
+      <li><b>จองคิว</b> รับเลขบัตรประชาชน ประเภทบริการ (จดทะเบียนสิทธิ / รังวัด / ขอคัดสำเนา) และวันที่ โดยเลขบัตรต้องเป็นตัวเลข 13 หลัก และคนเดียวกันห้ามจองซ้ำในวันเดียวกัน</li>
+      <li><b>ค้นหาคิว</b> จากเลขบัตรประชาชน</li>
+      <li><b>ยกเลิกคิว</b> จากหมายเลขคิว โดยต้องถามยืนยันก่อน</li>
+      <li><b>รายงาน</b> จำนวนคิวของแต่ละประเภทบริการในวันที่ระบุ</li>
+    </ol>
+    <details>
+      <summary>ดูเฉลยข้อ 3 (Python)</summary>
+      <p><b>คิดก่อนเขียน:</b> โจทย์แบบ "ระบบ 5 process" เกือบทุกข้อคือโครงเดียวกัน = <b>Login → เมนูวนซ้ำ → เพิ่ม / ค้นหา / ยกเลิก / รายงาน</b> จำโครงนี้ไว้แล้วเปลี่ยนแค่ชื่อข้อมูล</p>
+      <table>
+        <tr><th>ส่วน</th><th>ทำอะไร</th><th>ต้องเช็ค (validation)</th><th>ถ้าเป็น SQL</th></tr>
+        <tr><td><span class="step">1</span>Login</td><td>วนรับ user/pass สูงสุด 3 รอบ</td><td>ผิดครบ 3 ครั้ง → ล็อก</td><td>SELECT</td></tr>
+        <tr><td><span class="step">2</span>จองคิว</td><td>รับข้อมูล → เก็บลงรายการ</td><td>บัตร 13 หลัก, เลือกบริการถูก, ไม่จองซ้ำวันเดียวกัน</td><td>INSERT</td></tr>
+        <tr><td><span class="step">3</span>ค้นหา</td><td>หาคิวทั้งหมดของเลขบัตรนั้น</td><td>ไม่เจอ → แจ้ง</td><td>SELECT … WHERE</td></tr>
+        <tr><td><span class="step">4</span>ยกเลิก</td><td>เปลี่ยนสถานะเป็น "ยกเลิก"</td><td>เป็นตัวเลข, มีคิวนี้จริง, ถามยืนยัน</td><td>UPDATE</td></tr>
+        <tr><td><span class="step">5</span>รายงาน</td><td>นับคิวแต่ละบริการในวันนั้น</td><td>นับเฉพาะสถานะ "จอง"</td><td>COUNT + GROUP BY</td></tr>
+      </table>
+      <p class="why">ข้อมูลแต่ละคิวเก็บเป็น dictionary เช่น <code>{"no": 1, "id_card": "...", "service": "รังวัด", "date": "2026-11-21", "status": "จอง"}</code> แล้วรวมไว้ใน list ชื่อ <code>queues</code> (เหมือนตาราง 1 ตาราง แต่ละ dict = 1 แถว)</p>
+<pre><code>users = {"admin": "1234"}
+SERVICES = ["จดทะเบียนสิทธิ", "รังวัด", "ขอคัดสำเนา"]
+queues = []      # แต่ละคิว = {no, id_card, service, date, status}
+next_no = 1
+
+# 1. Login
+def login():
+    for i in range(3):
+        u = input("Username: ")
+        p = input("Password: ")
+        if users.get(u) == p:
+            print("เข้าสู่ระบบสำเร็จ")
+            return True
+        print("ไม่ถูกต้อง เหลือ", 2 - i, "ครั้ง")
+    print("ล็อกบัญชี")
+    return False
+
+def valid_id(id_card):
+    return len(id_card) == 13 and id_card.isdigit()
+
+# 2. จองคิว
+def book():
+    global next_no
+    id_card = input("เลขบัตรประชาชน: ")
+    if not valid_id(id_card):
+        print("เลขบัตรต้องเป็นตัวเลข 13 หลัก"); return
+    for i, s in enumerate(SERVICES, 1):
+        print(i, s)
+    c = input("เลือกบริการ: ")
+    if c not in ("1", "2", "3"):
+        print("ไม่มีบริการนี้"); return
+    date = input("วันที่ (YYYY-MM-DD): ")
+    for q in queues:   # ห้ามจองซ้ำวันเดียวกัน
+        if q["id_card"] == id_card and q["date"] == date and q["status"] == "จอง":
+            print("วันนี้มีคิวอยู่แล้ว"); return
+    queues.append({"no": next_no, "id_card": id_card,
+                   "service": SERVICES[int(c) - 1],
+                   "date": date, "status": "จอง"})
+    print("จองสำเร็จ หมายเลขคิว", next_no)
+    next_no += 1
+
+# 3. ค้นหาคิว
+def search():
+    id_card = input("เลขบัตรประชาชน: ")
+    found = [q for q in queues if q["id_card"] == id_card]
+    if not found:
+        print("ไม่พบข้อมูล"); return
+    for q in found:
+        print(q["no"], q["service"], q["date"], q["status"])
+
+# 4. ยกเลิกคิว
+def cancel():
+    no = input("หมายเลขคิว: ")
+    if not no.isdigit():
+        print("ต้องเป็นตัวเลข"); return
+    for q in queues:
+        if q["no"] == int(no) and q["status"] == "จอง":
+            if input("ยืนยันยกเลิก (y/n): ") == "y":
+                q["status"] = "ยกเลิก"
+                print("ยกเลิกแล้ว")
+            return
+    print("ไม่พบคิวนี้")
+
+# 5. รายงาน
+def report():
+    date = input("วันที่: ")
+    for s in SERVICES:
+        n = sum(1 for q in queues
+                if q["date"] == date and q["service"] == s and q["status"] == "จอง")
+        print(s, ":", n, "คิว")
+
+# เมนูหลัก
+def main():
+    if not login():
+        return
+    menu = {"1": book, "2": search, "3": cancel, "4": report}
+    while True:
+        print("1.จองคิว 2.ค้นหา 3.ยกเลิก 4.รายงาน 0.ออก")
+        ch = input("เลือก: ")
+        if ch == "0":
+            break
+        if ch in menu:
+            menu[ch]()
+        else:
+            print("เลือกไม่ถูกต้อง")
+
+main()</code></pre>
+      <div class="tips"><b>ส่วนที่คนตรวจให้คะแนน</b>
+        <ul>
+          <li>แยกเป็นฟังก์ชันครบทั้ง 5 ส่วน + มีเมนูหลักวน loop</li>
+          <li>มี validation ทุกจุดที่รับค่าจากผู้ใช้</li>
+          <li>ใช้เปลี่ยน status เป็น "ยกเลิก" แทนการลบทิ้ง (soft delete) แล้วเขียนอธิบายว่าเพื่อเก็บประวัติไว้ตรวจสอบ จะได้คะแนนเพิ่ม</li>
+          <li>ถ้ามีเวลา เขียนเพิ่มว่าถ้าใช้ฐานข้อมูลจริง ส่วนจองคิวจะเป็น <code>INSERT</code> และส่วนยกเลิกจะเป็น <code>UPDATE queue SET status='ยกเลิก' WHERE no=?</code></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <!-- ปรนัย -->
+  <div class="card" id="mcqCard">
+    <h2>ตอนที่ 2 · ปรนัย <span class="pts">(10 ข้อ)</span></h2>
+    <div id="mcqList"></div>
+    <button class="btn" id="checkBtn">ตรวจคำตอบ</button>
+    <button class="btn ghost" id="resetBtn">ทำใหม่</button>
+    <span id="score"></span>
+  </div>
+</main>
+
+<script>
+const MCQ = [
+  ["Normalization ขั้น 3NF กำจัดอะไร", ["Repeating group","Partial dependency","Transitive dependency","Multivalued dependency"], 2, "1NF กำจัด repeating group, 2NF กำจัด partial dependency, 3NF กำจัด transitive dependency"],
+  ["ข้อใดเป็นคำสั่ง DDL", ["SELECT","INSERT","CREATE","UPDATE"], 2, "DDL = CREATE / ALTER / DROP / TRUNCATE ส่วน SELECT, INSERT, UPDATE, DELETE เป็น DML"],
+  ["คุณสมบัติของ Primary Key คือข้อใด", ["ซ้ำได้","เป็น NULL ได้","ไม่ซ้ำและไม่เป็น NULL","ต้องเป็นตัวเลขเท่านั้น"], 2, "PK = UNIQUE + NOT NULL และเป็นข้อความก็ได้"],
+  ["IP address ทำงานอยู่ใน OSI layer ใด", ["Data Link","Network","Transport","Session"], 1, "Layer 3 Network (IP, router) · Layer 2 = MAC/switch · Layer 4 = TCP/UDP"],
+  ["HTTPS ใช้ port มาตรฐานใด", ["21","80","443","3306"], 2, "21 FTP, 80 HTTP, 443 HTTPS, 3306 MySQL"],
+  ["Subnet /26 มี host ที่ใช้งานได้กี่เครื่อง", ["30","62","64","126"], 1, "32 − 26 = 6 บิต → 2⁶ − 2 = 62 (ลบ network กับ broadcast)"],
+  ["สัญลักษณ์รูปข้าวหลามตัดใน flowchart หมายถึงอะไร", ["Process","Input/Output","Decision","Connector"], 2, "ข้าวหลามตัด = decision (ทางแยก ใช่/ไม่ใช่)"],
+  ["โครงสร้างข้อมูลแบบ FIFO คือข้อใด", ["Stack","Queue","Tree","Graph"], 1, "Queue = FIFO (เข้าก่อนออกก่อน) · Stack = LIFO"],
+  ["Binary search มีเงื่อนไขอะไร", ["ข้อมูลต้องเรียงลำดับแล้ว","ข้อมูลต้องเป็นตัวเลข","ใช้กับ linked list เท่านั้น","ข้อมูลห้ามซ้ำ"], 0, "ต้องเรียงลำดับก่อน · ความซับซ้อน O(log n)"],
+  ["ข้อใด <b>ไม่ใช่</b> aggregate function", ["COUNT","SUM","AVG","UPPER"], 3, "UPPER เป็น string function · aggregate ได้แก่ COUNT, SUM, AVG, MIN, MAX"]
+];
+const TH = ["ก","ข","ค","ง"];
+const list = document.getElementById("mcqList");
+MCQ.forEach(([q, opts, ans, ex], i) => {
+  const d = document.createElement("div");
+  d.className = "mcq"; d.dataset.ans = ans;
+  d.innerHTML = `<div><b>${i+1}.</b> ${q}</div>` +
+    opts.map((o, j) => `<label><input type="radio" name="q${i}" value="${j}"> ${TH[j]}. ${o}</label>`).join("") +
+    `<div class="explain">เฉลย ${TH[ans]} · ${ex}</div>`;
+  list.appendChild(d);
+});
+document.getElementById("checkBtn").onclick = () => {
+  let score = 0;
+  document.querySelectorAll(".mcq").forEach(d => {
+    const ans = +d.dataset.ans;
+    d.classList.add("checked");
+    d.querySelectorAll("label").forEach((l, j) => {
+      l.classList.remove("correct","wrong");
+      const picked = l.querySelector("input").checked;
+      if (j === ans) l.classList.add("correct");
+      else if (picked) l.classList.add("wrong");
+      if (picked && j === ans) score++;
+    });
+  });
+  document.getElementById("score").textContent = `ได้ ${score} / ${MCQ.length}`;
+};
+document.getElementById("resetBtn").onclick = () => {
+  document.querySelectorAll(".mcq").forEach(d => {
+    d.classList.remove("checked");
+    d.querySelectorAll("label").forEach(l => { l.classList.remove("correct","wrong"); l.querySelector("input").checked = false; });
+  });
+  document.getElementById("score").textContent = "";
+};
+
+// เปิด/ปิดเฉลยทั้งหมด
+let allOpen = false;
+document.getElementById("toggleAll").onclick = (e) => {
+  allOpen = !allOpen;
+  document.querySelectorAll("details").forEach(d => d.open = allOpen);
+  e.target.textContent = allOpen ? "ปิดเฉลยทั้งหมด" : "เปิดเฉลยทั้งหมด";
+};
+
+// ตัวจับเวลา 90 นาที
+let left = 90 * 60, tick = null;
+const tEl = document.getElementById("timer"), sBtn = document.getElementById("startBtn");
+const fmt = s => String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0");
+sBtn.onclick = () => {
+  if (tick) { clearInterval(tick); tick = null; sBtn.textContent = "จับเวลาต่อ"; return; }
+  sBtn.textContent = "หยุดชั่วคราว";
+  tick = setInterval(() => {
+    left--; tEl.textContent = fmt(Math.max(left,0));
+    if (left <= 0) { clearInterval(tick); tick = null; tEl.textContent = "หมดเวลา"; sBtn.textContent = "เริ่มใหม่"; left = 90*60; }
+  }, 1000);
+};
+</script>
+</body>
+</html>
