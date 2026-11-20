@@ -90,7 +90,7 @@
 <pre><code>owner(owner_id PK, name, id_card, phone)
 land(land_id PK, deed_no, owner_id FK→owner, province, area_wa, price)
 -- area_wa = เนื้อที่ (ตารางวา), price = ราคาประเมิน (บาท)</code></pre>
-    ข้อมูลตัวอย่างในตาราง:
+    <span id="sample">ข้อมูลตัวอย่างในตาราง (ใช้ชุดนี้ชุดเดียวทั้งโจทย์และเฉลย):</span>
     <div class="tables">
       <div><div class="tname">owner (เจ้าของ)</div>
         <table class="data">
@@ -121,7 +121,7 @@ land(land_id PK, deed_no, owner_id FK→owner, province, area_wa, price)
     </ol>
     <details>
       <summary>ดูเฉลยข้อ 1</summary>
-      <p class="why">ผลลัพธ์ที่แสดงในแต่ละข้อคิดจาก<b>ข้อมูลตัวอย่างตั้งต้น</b> (ยังไม่ได้รันข้อ 1.1–1.4)</p>
+      <p class="tips" style="margin-top:0">ทุกตารางในเฉลยคิดจาก<b>ตาราง owner / land ชุดเดียวกับในโจทย์</b> (<a href="#sample">↑ กลับไปดูตาราง</a>) · แต่ละข้อคิดจากข้อมูลตั้งต้น ไม่ได้ต่อจากผลของข้ออื่น · คอลัมน์ <b>มาจาก land_id</b> บอกว่าแถวนั้นมาจากแถวไหนในตารางโจทย์</p>
       <p class="why">วิธีคิดทุกข้อ: <b>อยากได้อะไร</b> (SELECT) → <b>จากตารางไหน</b> (FROM / JOIN) → <b>เงื่อนไขอะไร</b> (WHERE) → <b>จัดกลุ่ม/เรียงไหม</b> (GROUP BY / HAVING / ORDER BY)</p>
 
       <div class="ans"><div class="q">1.1 เพิ่มข้อมูล → INSERT</div>
@@ -142,7 +142,7 @@ VALUES (101, 'สมชาย ใจดี', '1234567890123', '0812345678');</co
 WHERE province = 'ปทุมธานี' AND area_wa &gt; 400
 ORDER BY area_wa DESC;</code></pre>
         <div class="why">เงื่อนไขต้องจริง <b>ทั้งคู่</b> จึงใช้ AND · มากไปน้อย = <b>DESC</b> (น้อยไปมาก = ASC)</div>
-        <div class="res">ผลลัพธ์: ปทุมธานีมี 3 แปลง แต่ 45678 มีแค่ 200 ตร.วา เลยไม่ผ่านเงื่อนไข</div>
+        <div class="res">ผลลัพธ์: ปทุมธานีมี 3 แปลง (land_id 1, 3, 4) แต่ land_id 4 มีแค่ 200 ตร.วา เลยไม่ผ่านเงื่อนไข</div>
         <table class="data">
           <tr><th>land_id</th><th>deed_no</th><th>owner_id</th><th>province</th><th>area_wa</th><th>price</th></tr>
           <tr><td>3</td><td>34567</td><td>2</td><td>ปทุมธานี</td><td class="num">1,200</td><td class="num">3,600,000</td></tr>
@@ -153,7 +153,7 @@ ORDER BY area_wa DESC;</code></pre>
 <pre><code>UPDATE land SET owner_id = 101
 WHERE deed_no = '12345';</code></pre>
         <div class="why">ถ้าลืม WHERE = ที่ดิน<b>ทุกแปลง</b>ในระบบจะกลายเป็นของ 101 ทันที</div>
-        <div class="res">แถวที่เปลี่ยน: owner_id ของโฉนด 12345 จาก 1 → 101</div>
+        <div class="res">แถวที่เปลี่ยน = land_id 1 ในตารางโจทย์: owner_id จาก 1 → 101</div>
         <table class="data">
           <tr><th>land_id</th><th>deed_no</th><th>owner_id</th><th>province</th></tr>
           <tr class="add"><td>1</td><td>12345</td><td><s>1</s> → 101</td><td>ปทุมธานี</td></tr>
@@ -162,7 +162,7 @@ WHERE deed_no = '12345';</code></pre>
       <div class="ans"><div class="q">1.4 ลบข้อมูล → DELETE FROM … WHERE</div>
 <pre><code>DELETE FROM land WHERE deed_no = '99999';</code></pre>
         <div class="why">ไม่ต้องใส่ * (ไม่ใช่ <code>DELETE * FROM</code>) · ลืม WHERE = ลบทั้งตาราง</div>
-        <div class="res">แถวที่ถูกลบ (ขีดฆ่า)</div>
+        <div class="res">แถวที่ถูกลบ = land_id 5 ในตารางโจทย์ (ขีดฆ่า)</div>
         <table class="data">
           <tr><th>land_id</th><th>deed_no</th><th>owner_id</th><th>province</th></tr>
           <tr class="dim"><td>5</td><td>99999</td><td>NULL</td><td>สระบุรี</td></tr>
@@ -176,20 +176,20 @@ JOIN owner o ON l.owner_id = o.owner_id;</code></pre>
         <div class="tables">
           <div><div class="res"><b>JOIN</b> (INNER): ได้ 4 แถว · 99999 หายไปเพราะไม่มีเจ้าของ</div>
             <table class="data">
-              <tr><th>deed_no</th><th>name</th><th>province</th></tr>
-              <tr><td>12345</td><td>มาลี ศรีสุข</td><td>ปทุมธานี</td></tr>
-              <tr><td>23456</td><td>มาลี ศรีสุข</td><td>นนทบุรี</td></tr>
-              <tr><td>34567</td><td>วิชัย ทองดี</td><td>ปทุมธานี</td></tr>
-              <tr><td>45678</td><td>วิชัย ทองดี</td><td>ปทุมธานี</td></tr>
+              <tr><th>มาจาก land_id</th><th>deed_no</th><th>name</th><th>province</th></tr>
+              <tr><td>1</td><td>12345</td><td>มาลี ศรีสุข</td><td>ปทุมธานี</td></tr>
+              <tr><td>2</td><td>23456</td><td>มาลี ศรีสุข</td><td>นนทบุรี</td></tr>
+              <tr><td>3</td><td>34567</td><td>วิชัย ทองดี</td><td>ปทุมธานี</td></tr>
+              <tr><td>4</td><td>45678</td><td>วิชัย ทองดี</td><td>ปทุมธานี</td></tr>
             </table></div>
           <div><div class="res"><b>LEFT JOIN</b> (land อยู่ซ้าย): ได้ครบ 5 แถว</div>
             <table class="data">
-              <tr><th>deed_no</th><th>name</th><th>province</th></tr>
-              <tr><td>12345</td><td>มาลี ศรีสุข</td><td>ปทุมธานี</td></tr>
-              <tr><td>23456</td><td>มาลี ศรีสุข</td><td>นนทบุรี</td></tr>
-              <tr><td>34567</td><td>วิชัย ทองดี</td><td>ปทุมธานี</td></tr>
-              <tr><td>45678</td><td>วิชัย ทองดี</td><td>ปทุมธานี</td></tr>
-              <tr class="add"><td>99999</td><td class="null">NULL</td><td>สระบุรี</td></tr>
+              <tr><th>มาจาก land_id</th><th>deed_no</th><th>name</th><th>province</th></tr>
+              <tr><td>1</td><td>12345</td><td>มาลี ศรีสุข</td><td>ปทุมธานี</td></tr>
+              <tr><td>2</td><td>23456</td><td>มาลี ศรีสุข</td><td>นนทบุรี</td></tr>
+              <tr><td>3</td><td>34567</td><td>วิชัย ทองดี</td><td>ปทุมธานี</td></tr>
+              <tr><td>4</td><td>45678</td><td>วิชัย ทองดี</td><td>ปทุมธานี</td></tr>
+              <tr class="add"><td>5</td><td>99999</td><td class="null">NULL</td><td>สระบุรี</td></tr>
             </table></div>
         </div>
 <pre><code>-- โจทย์บอก "ทุกแปลง" → LEFT JOIN ตรงกว่า (เอาตารางที่ต้องการให้ครบไว้ฝั่งซ้าย)
@@ -207,15 +207,15 @@ HAVING COUNT(*) &gt; 1;</code></pre>
         <div class="tables">
           <div><div class="res">หลัง GROUP BY (ก่อน HAVING)</div>
             <table class="data">
-              <tr><th>province</th><th>total</th></tr>
-              <tr><td>ปทุมธานี</td><td class="num">3</td></tr>
-              <tr class="dim"><td>นนทบุรี</td><td class="num">1</td></tr>
-              <tr class="dim"><td>สระบุรี</td><td class="num">1</td></tr>
+              <tr><th>province</th><th>total</th><th>มาจาก land_id</th></tr>
+              <tr><td>ปทุมธานี</td><td class="num">3</td><td>1, 3, 4</td></tr>
+              <tr class="dim"><td>นนทบุรี</td><td class="num">1</td><td>2</td></tr>
+              <tr class="dim"><td>สระบุรี</td><td class="num">1</td><td>5</td></tr>
             </table></div>
           <div><div class="res">ผลลัพธ์สุดท้าย (HAVING &gt; 1)</div>
             <table class="data">
-              <tr><th>province</th><th>total</th></tr>
-              <tr><td>ปทุมธานี</td><td class="num">3</td></tr>
+              <tr><th>province</th><th>total</th><th>มาจาก land_id</th></tr>
+              <tr><td>ปทุมธานี</td><td class="num">3</td><td>1, 3, 4</td></tr>
             </table></div>
         </div></div>
 
@@ -227,9 +227,9 @@ GROUP BY o.owner_id, o.name;</code></pre>
         <div class="why">"<b>แต่ละ</b>คน" = GROUP BY · group ด้วย owner_id ด้วยกันกรณีชื่อซ้ำ · คอลัมน์ที่อยู่ใน SELECT แต่ไม่ได้อยู่ในฟังก์ชัน (name) ต้องอยู่ใน GROUP BY</div>
         <div class="res">ผลลัพธ์: มาลี = 2,500,000 + 900,000 · วิชัย = 3,600,000 + 600,000 · สุดาไม่โผล่เพราะไม่มีที่ดิน (ถ้าอยากให้โผล่เป็น NULL ใช้ <code>FROM owner o LEFT JOIN land l</code>)</div>
         <table class="data">
-          <tr><th>name</th><th>total_price</th></tr>
-          <tr><td>มาลี ศรีสุข</td><td class="num">3,400,000</td></tr>
-          <tr><td>วิชัย ทองดี</td><td class="num">4,200,000</td></tr>
+          <tr><th>name</th><th>total_price</th><th>มาจาก land_id</th></tr>
+          <tr><td>มาลี ศรีสุข</td><td class="num">3,400,000</td><td>1 + 2</td></tr>
+          <tr><td>วิชัย ทองดี</td><td class="num">4,200,000</td><td>3 + 4</td></tr>
         </table></div>
       <div class="tips"><b>จุดที่มักโดนหักคะแนน</b>
         <ul>
